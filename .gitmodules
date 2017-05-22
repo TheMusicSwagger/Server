@@ -1,3 +1,6 @@
 [submodule "communicator"]
 	path = communicator
 	url = https://github.com/TheMusicSwagger/Communicator.git
+[submodule "doc"]
+	path = doc
+	url = https://github.com/TheMusicSwagger/Documentation.git
