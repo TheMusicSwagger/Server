@@ -1,0 +1,3 @@
+[submodule "communicator"]
+	path = communicator
+	url = https://github.com/TheMusicSwagger/Communicator.git
