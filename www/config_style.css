@@ -1,0 +1,124 @@
+html,
+body {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    font-size: 13px;
+    font-family: sans-serif;
+}
+
+#working_area {
+    background-color: grey;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#toolbar {
+    z-index: 100;
+    background-color: black;
+    width: 100%;
+    padding: 20px;
+    position: fixed;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    overflow: scroll;
+}
+
+.toolcontainer {
+    margin: 10px;
+}
+
+.tool {
+    color: white;
+    text-align: center;
+    background-color: hotpink;
+    width: 80px;
+    padding: 20px;
+    border-radius: 20px;
+    border-style: none;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.5), 0 20px 30px 20px rgba(0, 0, 0, 0.19);
+}
+
+#main_cavas {
+    z-index: 100;
+    position: fixed;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+}
+
+.link_container {
+    margin: 10px 0;
+    text-align: center;
+    position: relative;
+}
+
+.pseudo_link {
+    text-align: center;
+    background-color: mediumpurple;
+    border-color: lightblue;
+    border-style: solid;
+    border-width: 2px;
+    width: 10px;
+    height: 10px;
+}
+
+.link {
+    text-align: center;
+    background-color: mediumvioletred;
+    border-color: lightblue;
+    border-style: solid;
+    border-width: 2px;
+    width: 10px;
+    height: 10px;
+}
+
+.tool:hover {
+    cursor: grab;
+}
+
+.tool:active {
+    cursor: grabbing;
+}
+
+.links_container {
+    display: none;
+    justify-content: space-between;
+    flex-direction: row;
+    position: relative;
+}
+
+.inputs .outputs {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.boxinput {
+    width: 50px;
+}
+
+#output {
+    right: 0;
+    bottom: 30%;
+    position: fixed;
+    background-color: lightcoral;
+    margin: 30px;
+}
+
+#save_button {
+    position: fixed;
+    font-weight: 600;
+    background-color: hotpink;
+    right: 0;
+    bottom: 0;
+    margin: 30px;
+    padding: 20px 50px;
+    border-radius: 20px;
+    border-style: none;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.5), 0 20px 30px 20px rgba(0, 0, 0, 0.19);
+}
