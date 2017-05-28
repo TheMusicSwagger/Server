@@ -129,14 +129,19 @@ class SinBox(SoundBox):
 
 class DeviceBox(SoundBox):
     """
-    Get a value from a DeviceValue.
+    Get the last value in the data center for the give device/channel.
 
     Custom Buffer :
-        DeviceValue object
+        CUID:channel
     """
+    datacenter=None
+
+    def __init__(self,datacenter,*args,custom_buff=None):
+        super(DeviceBox, self).__init__(*args,custom_buff)
+        self.datacenter=datacenter
 
     def get(self):
-        return self.custom_buff.get_value()
+        return self.datacenter.get(*self.custom_buff.split(":"))
 
 
 boxes_identifiers = {

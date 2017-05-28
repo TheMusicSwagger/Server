@@ -15,6 +15,9 @@
 	}
     $db->query("DELETE FROM links");
     $db->query("DELETE FROM boxes");
+    $db->query("DELETE FROM update_number");
+    $db->query("INSERT INTO update_number (ID) VALUES (NULL);");
+
     
 	for($i=0;$i<count($links);$i++){
 		$entry=$links[$i];
