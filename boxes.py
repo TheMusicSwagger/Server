@@ -1,4 +1,4 @@
-import sounds, config
+import sounds, configuration
 
 
 class SoundBox(object):
@@ -125,7 +125,7 @@ class SinBox(SoundBox):
     """
 
     def get(self):
-        return sounds.WaveGenerator().sinusoid(config.SOUND_PROCESS_LENGTH, config.SOUND_DEFAULT_SAMPLERATE,
+        return sounds.WaveGenerator().sinusoid(configuration.SOUND_PROCESS_LENGTH, configuration.SOUND_DEFAULT_SAMPLERATE,
                                                self.parents[0].get())
 
 

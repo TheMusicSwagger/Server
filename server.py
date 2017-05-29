@@ -1,4 +1,4 @@
-import os,config,uuid,time,pymysql
+import os,configuration,uuid,time,pymysql
 from communicator.communicator import Communicator
 from sounds import SoundPlayer
 
@@ -37,21 +37,21 @@ class ServerBrain(object):
     # the sound player that allows to play sounds
 
     def __init__(self,data_center):
-        if os.path.isfile(config.GUID_FILENAME):
-            guidfile = open(config.GUID_FILENAME, "r")
+        if os.path.isfile(configuration.GUID_FILENAME):
+            guidfile = open(configuration.GUID_FILENAME, "r")
             self.global_uid = guidfile.read()
             guidfile.close()
         else:
-            guidfile = open(config.GUID_FILENAME, "w")
+            guidfile = open(configuration.GUID_FILENAME, "w")
             self.global_uid = str(uuid.uuid4()).replace("-", "")
             guidfile.write(self.global_uid)
             guidfile.close()
-        config.log(self.get_guid())
+        configuration.log(self.get_guid())
         try:
-            self.database = pymysql.connect(host=config.DB_IP, user=config.DB_USER, password=config.DB_PASS, db=config.DB_NAME,
-                                            charset=config.DB_CHARSET)
+            self.database = pymysql.connect(host=configuration.DB_IP, user=configuration.DB_USER, password=configuration.DB_PASS, db=configuration.DB_NAME,
+                                            charset=configuration.DB_CHARSET)
         except pymysql.err.Error:
-            config.warn("Database setup error !")
+            configuration.warn("Database setup error !")
         self.communicator = Communicator(True,self.get_guid(),lambda a,b:data_center.update(a,b))
         self.player=SoundPlayer()
 
@@ -79,7 +79,7 @@ class ServerBrain(object):
 
 
     def check_update(self):
-        very_last_update=self.db_query("SELECT ID FROM " + config.TB_UPDATE_NUMBER)[0]
+        very_last_update=self.db_query("SELECT ID FROM " + configuration.TB_UPDATE_NUMBER)[0]
         if self.last_update:
             if self.last_update<very_last_update:
                 self.update_tree()
@@ -94,7 +94,7 @@ class ServerBrain(object):
         # generate sound from tree
         self.player.play(sound)
         # feed the player
-        while time.time()-beginning_time<config.SOUND_PROCESS_LENGTH:
+        while time.time()-beginning_time<configuration.SOUND_PROCESS_LENGTH:
             pass
             # wait to make an other sound
 
