@@ -40,14 +40,16 @@ window.onload = function () {
     context = canvas.getContext("2d");
 };
 
-window.onresize = function (event) {
+function canvas_change_handle(event) {
     /*
         Event to handle the resizing of the window
     */
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     update_links();
-};
+}
+window.onscroll = canvas_change_handle;
+window.onresize = canvas_change_handle;
 
 
 function get_link_id(link) {
@@ -334,13 +336,23 @@ function get_linked(index) {
     */
     var link1 = "link_0_" + index.toString(),
         link2 = "link_1_" + index.toString();
+    console.log(document.getElementById(link1).parentNode.parentNode.getAttribute("class"));
+
+    // check which link part is the input/output
+    if (document.getElementById(link1).parentNode.parentNode.class == "outputs") {
+        out = link1;
+        inp = link2;
+    } else {
+        out = link2;
+        inp = link1;
+    }
     return [{
-            "boxid": get_link_tool_number(link1),
-            "linkid": get_link_number(link1)
+            "boxid": get_link_tool_number(out),
+            "linkid": get_link_number(out)
     },
         {
-            "boxid": get_link_tool_number(link2),
-            "linkid": get_link_number(link2)
+            "boxid": get_link_tool_number(inp),
+            "linkid": get_link_number(inp)
     }];
 }
 
@@ -353,15 +365,11 @@ function save_data() {
     for (var i = 0; i < available_links.length; i++) {
         var lks = get_linked(available_links[i]);
         var linkdata = {
-            "BOX_ID_1": lks[0]["boxid"],
-            "LINK_ID_1": lks[0]["linkid"],
-            "BOX_ID_2": lks[1]["boxid"],
-            "LINK_ID_2": lks[1]["linkid"]
+            "BOX_ID_OUT": lks[0]["boxid"],
+            "LINK_ID_OUT": lks[0]["linkid"],
+            "BOX_ID_IN": lks[1]["boxid"],
+            "LINK_ID_IN": lks[1]["linkid"]
         };
-        // json data to send
-        // array("LINKS"=>array(array("BOX_ID_1"=>"1","LINK_ID_1"=>"1","BOX_ID_2"=>"2","LINK_ID_2"=>"1")),
-        // "BOXES"=>array(array("TYPE"=>"IN","BOX_ID"=>"1","SPEC_PARAM"=>"hello"),array("TYPE"=>"OUT","BOX_ID"=>"2","SPEC_PARAM"=>"hello2"))
-        //)
         links.push(linkdata);
     }
     dataDict["LINKS"] = links;

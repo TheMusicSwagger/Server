@@ -76,7 +76,7 @@ class ServerBrain(object):
         """
         Generate a tree of boxes from the configuration.
         """
-        
+
 
     def check_update(self):
         very_last_update=self.db_query("SELECT ID FROM " + config.TB_UPDATE_NUMBER)[0]

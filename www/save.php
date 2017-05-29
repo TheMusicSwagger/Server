@@ -21,11 +21,11 @@
     
 	for($i=0;$i<count($links);$i++){
 		$entry=$links[$i];
-		$BOX_ID_1=$entry["BOX_ID_1"];
-		$LINK_ID_1=$entry["LINK_ID_1"];
-		$BOX_ID_2=$entry["BOX_ID_2"];
-		$LINK_ID_2=$entry["LINK_ID_2"];
-		$db->query("INSERT INTO links(BOX_ID_1, LINK_ID_1, BOX_ID_2, LINK_ID_2) VALUES ('$BOX_ID_1','$LINK_ID_1','$BOX_ID_2','$LINK_ID_2')");
+		$BOX_ID_OUT=$entry["BOX_ID_OUT"];
+		$LINK_ID_OUT=$entry["LINK_ID_OUT"];
+		$BOX_ID_IN=$entry["BOX_ID_IN"];
+		$LINK_ID_IN=$entry["LINK_ID_IN"];
+		$db->query("INSERT INTO links(BOX_ID_OUT, LINK_ID_OUT, BOX_ID_IN, LINK_ID_IN) VALUES ('$BOX_ID_OUT','$LINK_ID_OUT','$BOX_ID_IN','$LINK_ID_IN')");
 	}
 	for($i=0;$i<count($boxes);$i++){ 
 		$entry=$boxes[$i];

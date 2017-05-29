@@ -11,10 +11,12 @@ class SoundBox(object):
 
     # buffer for custom value
 
-    def __init__(self, *args, custom_buff=None):
+    def __init__(self, custom_buff=None):
         super(SoundBox, self).__init__()
-        self.parents = args
         self.custom_buff = custom_buff
+
+    def set_parents(self, *args):
+        self.parents=args
 
     def get(self):
         raise NotImplementedError()
