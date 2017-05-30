@@ -246,11 +246,17 @@ class SoundPlayer(threading.Thread):
                 self.output.play(self.last_sound)
 
     def kill(self, force=False):
-        while not force and len(self.to_be_played) > 0:
+        if force:
+            self.flush()
+        while len(self.to_be_played) > 0:
             time.sleep(0.001)
+        self.flush()
         self.is_running = False
         self.output.close()
         self.join()
 
     def pause(self):
         self.is_paused = True
+
+    def flush(self):
+        self.to_be_played=[]

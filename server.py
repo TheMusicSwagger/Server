@@ -64,6 +64,7 @@ class ServerBrain(object):
         self.datacenter=datacenter
 
     def stop(self):
+        self.player.kill(True)
         self.communicator.stop()
 
     def db_query(self, query, args=()):
@@ -92,7 +93,7 @@ class ServerBrain(object):
             boxes[link[2]].set_parent(link[3],boxes[link[1]])
         self.tree=boxes
         self.output=self.tree[0]
-
+        self.player.flush()
 
     def check_update(self):
         very_last_update=self.db_query("SELECT ID FROM " + cfg.TB_UPDATE_NUMBER)[0]
