@@ -16,7 +16,7 @@ class Config:
     ################################################
     # Logging functions                            #
     ################################################
-    DEBUG_MODE = True
+    DEBUG_MODE = False
     RAISE_ERROR = False
     def log(text):
         if Config.DEBUG_MODE:

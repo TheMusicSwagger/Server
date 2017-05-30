@@ -21,6 +21,7 @@ class DataCenter(object):
         return value
 
     def update(self,cuid,values):
+        cfg.log(str(cuid)+" gave new data !")
         self.devices[cuid]=values
 
 

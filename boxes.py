@@ -133,10 +133,12 @@ class SinBox(SoundBox):
 
 
 class DeviceBox(SoundBox):
-    """
+    """self.custom_buff.split(":")
     Get the last value in the data center for the give device/channel.
 
-    Custom Buffer :
+    Parents :
+        0
+        value1
         CUID:channel
     """
     datacenter=None
@@ -146,7 +148,8 @@ class DeviceBox(SoundBox):
         self.datacenter=datacenter
 
     def get(self):
-        return self.datacenter.get(*self.custom_buff.split(":"))
+        cuid,channel=self.parents[0].get().split(":")
+        return self.datacenter.get(int(cuid),int(channel))
 
 class RandomBox(SoundBox):
     """
