@@ -336,24 +336,19 @@ function get_linked(index) {
     */
     var link1 = "link_0_" + index.toString(),
         link2 = "link_1_" + index.toString();
-    console.log(document.getElementById(link1).parentNode.parentNode.getAttribute("class"));
-
     // check which link part is the input/output
-    if (document.getElementById(link1).parentNode.parentNode.class == "outputs") {
+    if (document.getElementById(link1).parentNode.parentNode.getAttribute("class") == "outputs") {
         out = link1;
         inp = link2;
     } else {
         out = link2;
         inp = link1;
     }
-    return [{
-            "boxid": get_link_tool_number(out),
-            "linkid": get_link_number(out)
-    },
-        {
-            "boxid": get_link_tool_number(inp),
-            "linkid": get_link_number(inp)
-    }];
+    return {
+        "from": get_link_tool_number(out),
+        "to": get_link_tool_number(inp),
+        "where": get_link_number(inp)
+    };
 }
 
 function save_data() {
@@ -364,11 +359,11 @@ function save_data() {
     var links = [];
     for (var i = 0; i < available_links.length; i++) {
         var lks = get_linked(available_links[i]);
+        console.log(lks["from"] + " is linked to " + lks["to"] + " on " + lks["where"]);
         var linkdata = {
-            "BOX_ID_OUT": lks[0]["boxid"],
-            "LINK_ID_OUT": lks[0]["linkid"],
-            "BOX_ID_IN": lks[1]["boxid"],
-            "LINK_ID_IN": lks[1]["linkid"]
+            "FROM": lks["from"],
+            "TO": lks["to"],
+            "WHERE": lks["where"]
         };
         links.push(linkdata);
     }

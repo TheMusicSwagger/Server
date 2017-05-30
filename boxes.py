@@ -1,5 +1,6 @@
 import sounds
 from serv_config import Config as cfg
+import random
 
 
 class SoundBox(object):
@@ -15,9 +16,10 @@ class SoundBox(object):
     def __init__(self, custom_buff=None):
         super(SoundBox, self).__init__()
         self.custom_buff = custom_buff
+        self.parents={}
 
-    def set_parents(self, *args):
-        self.parents=args
+    def set_parent(self, n, parent):
+        self.parents[n]=parent
 
     def get(self):
         raise NotImplementedError()
@@ -35,7 +37,7 @@ class PitchBox(SoundBox):
 
     def get(self):
         sound1 = self.parents[0].get()
-        value1 = self.parents[1].get()
+        value1 = float(self.parents[1].get())
         new_sound = sounds.WaveSound(sound1.get_samplerate())
         for i in range(sound1.get_length()):
             point = sound1.get_value(i)
@@ -70,8 +72,8 @@ class AddBox(SoundBox):
         first sound, second sound, ratio of each sound
     """
 
-    def process(self):
-        return self.parents[0].get().add(self.parents[1].get(), self.parents[3].get())
+    def get(self):
+        return self.parents[0].get().add(self.parents[1].get(), eval(str(self.parents[2].get())))
 
 
 class ValueBox(SoundBox):
@@ -127,7 +129,7 @@ class SinBox(SoundBox):
 
     def get(self):
         return sounds.WaveGenerator().sinusoid(cfg.SOUND_PROCESS_LENGTH, cfg.SOUND_DEFAULT_SAMPLERATE,
-                                               self.parents[0].get())
+                                               int(eval(str(self.parents[0].get()))))
 
 
 class DeviceBox(SoundBox):
@@ -139,13 +141,56 @@ class DeviceBox(SoundBox):
     """
     datacenter=None
 
-    def __init__(self,datacenter,*args,custom_buff=None):
-        super(DeviceBox, self).__init__(*args,custom_buff)
+    def __init__(self,datacenter,custom_buff=None):
+        super(DeviceBox, self).__init__(custom_buff)
         self.datacenter=datacenter
 
     def get(self):
         return self.datacenter.get(*self.custom_buff.split(":"))
 
+class RandomBox(SoundBox):
+    """
+    Give a random value
+    """
+    def get(self):
+        return random.random()
+
+class MultiplyBox(SoundBox):
+    """
+    Multiply a number with another.
+
+    Parents :
+        0            , 1
+        value1       , value2
+        first number , second number
+    """
+    def get(self):
+        return eval(str(self.parents[0].get()))*eval(str(self.parents[1].get()))
+
+class SumBox(SoundBox):
+    """
+    Return the sum of two values
+
+    Parents :
+        0            , 1
+        value1       , value2
+        first number , second number
+    """
+    def get(self):
+        return eval(str(self.parents[0].get()))+eval(str(self.parents[1].get()))
+
+class OutBox(SoundBox):
+    """
+    Just represents the output of the system.
+
+    Parents :
+        0
+        sound1
+        the final sound to output
+    """
+
+    def get(self):
+        return self.parents[0].get()
 
 boxes_identifiers = {
     "PITCH": PitchBox,
@@ -154,5 +199,9 @@ boxes_identifiers = {
     "ADD": AddBox,
     "LESS": LessBox,
     "SINE": SinBox,
-    "VALUE": ValueBox
+    "VALUE": ValueBox,
+    "OUT": OutBox,
+    "MULTI":MultiplyBox,
+    "RAND":RandomBox,
+    "SUM":SumBox
 }

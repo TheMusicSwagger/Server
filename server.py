@@ -1,7 +1,8 @@
-import os,uuid,time,pymysql
+import os,uuid,time,pymysql,boxes as bxs
 from communicator.communicator import Communicator
 from sounds import SoundPlayer
 from serv_config import Config as cfg
+
 
 class DataCenter(object):
     """
@@ -27,17 +28,21 @@ class ServerBrain(object):
     """
     The part of the server that have a control over communication and sound generation
     """
-    global_uid = None
     communicator = None
     database = None
     # sql database for config
     last_update=None
+    tree=None
+    # the current tree
     output=None
     # the sound output of the current tree
     player=None
     # the sound player that allows to play sounds
-
+    datacenter=None
+    # the datacenter where all last device values are stores
     def __init__(self,data_center):
+        """
+        # useless for server
         if os.path.isfile(cfg.GUID_FILENAME):
             guidfile = open(cfg.GUID_FILENAME, "r")
             self.global_uid = guidfile.read()
@@ -47,20 +52,16 @@ class ServerBrain(object):
             self.global_uid = str(uuid.uuid4()).replace("-", "")
             guidfile.write(self.global_uid)
             guidfile.close()
-        cfg.log(self.get_guid())
+
+        """
         try:
             self.database = pymysql.connect(host=cfg.DB_IP, user=cfg.DB_USER, password=cfg.DB_PASS, db=cfg.DB_NAME,
                                             charset=cfg.DB_CHARSET)
         except pymysql.err.Error:
             cfg.warn("Database setup error !")
-        self.communicator = Communicator(True,self.get_guid(),lambda a,b:data_center.update(a,b))
+        self.communicator = Communicator(True,data_callback=lambda a,b:data_center.update(a,b))
         self.player=SoundPlayer()
-
-    def get_guid(self):
-        """
-        :return: 'self.global_uid'
-        """
-        return self.global_uid
+        self.datacenter=datacenter
 
     def stop(self):
         self.communicator.stop()
@@ -77,6 +78,20 @@ class ServerBrain(object):
         """
         Generate a tree of boxes from the cfg.
         """
+        boxes={}
+        rboxes=self.db_query("SELECT * FROM "+cfg.TB_BOXES)
+        for box in rboxes:
+            # ID(0) TYPE(1) BOX_ID(2) SPEC_PARAM(3)
+            if box[1]=="DEVICE":
+                boxes[box[2]]=bxs.boxes_identifiers[box[1]](self.datacenter,box[3])
+            else:
+                boxes[box[2]]=bxs.boxes_identifiers[box[1]](box[3])
+        rlinks=self.db_query("SELECT * FROM "+cfg.TB_LINKS)
+        for link in rlinks:
+            # ID(0) FROM_B(1) TO_B(2) WHERE_L(3)
+            boxes[link[2]].set_parent(link[3],boxes[link[1]])
+        self.tree=boxes
+        self.output=self.tree[0]
 
 
     def check_update(self):
@@ -84,6 +99,7 @@ class ServerBrain(object):
         if self.last_update:
             if self.last_update<very_last_update:
                 self.update_tree()
+                self.last_update=very_last_update
         else:
             self.last_update=very_last_update
             self.update_tree()
@@ -91,11 +107,17 @@ class ServerBrain(object):
     def make_sound(self):
         beginning_time=time.time()
         self.check_update()
-        sound=self.output.get()
         # generate sound from tree
-        self.player.play(sound)
         # feed the player
-        while time.time()-beginning_time<cfg.SOUND_PROCESS_LENGTH:
+        sound=None
+        try:
+            sound=self.output.get()
+        except Exception as e:
+            print("Configuration error : ",e)
+            self.player.pause()
+        if sound is not None:
+            self.player.play(sound)
+        while time.time()-beginning_time<cfg.SOUND_PROCESS_LENGTH/1000:
             pass
             # wait to make an other sound
 

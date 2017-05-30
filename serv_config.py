@@ -1,3 +1,4 @@
+import time
 class Config:
     SOUND_PROCESS_LENGTH=50
     SOUND_DEFAULT_SAMPLERATE=22000
@@ -9,6 +10,21 @@ class Config:
     DB_NAME = "themusicswagger_db"
     DB_CHARSET = "utf8"
     # database infos to connect
-    TB_UPDATE_NUMBER="update_numbers"
+    TB_UPDATE_NUMBER="update_number"
     TB_BOXES="boxes"
     TB_LINKS="links"
+    ################################################
+    # Logging functions                            #
+    ################################################
+    DEBUG_MODE = False
+    RAISE_ERROR = False
+    def log(text):
+        if Config.DEBUG_MODE:
+            print("[---] [" + str(time.time()) + ")]", text)
+
+
+    def warn(text):
+        if Config.RAISE_ERROR:
+            raise Exception(text)
+        else:
+            print("[!!!] [" + str(time.time()) + ")]", text)

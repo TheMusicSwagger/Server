@@ -32,9 +32,7 @@
                 }
                 echo '</div>';
                 echo '<div class="outputs">';
-                for($i=0;$i<$data['outputs'];$i++){
-                    echo '<div class="link_container"></div>';
-                }
+                echo '<div class="link_container"></div>';
                 echo '</div>';
                 echo '</div>';
                 echo '</div>';

@@ -1,4 +1,4 @@
-import math, subprocess, threading, time
+import math, subprocess, threading, time, os
 
 
 class WaveSound(object):
@@ -185,18 +185,13 @@ class SoundOutput():
                 devname = '/dev/' + out.decode("ascii")[:-1]
             # opening device
             dsp = None
-            tries = 0
             while True:
                 try:
-                    tries += 1
                     dsp = ossa.open(devname, 'w')
                     break
                 except Exception as e:
-                    if tries >= 10:
-                        print("Can't open device :", e)
-                        break
-                    else:
-                        time.sleep(0.5)
+                    os.system("fuser "+devname+" -k")
+                    time.sleep(0.5)
             self.device = dsp
         elif WINAUDIO_AVAILABLE:
             self.type = 1
