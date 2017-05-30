@@ -1,4 +1,5 @@
-import sounds, configuration
+import sounds
+from serv_config import Config as cfg
 
 
 class SoundBox(object):
@@ -125,7 +126,7 @@ class SinBox(SoundBox):
     """
 
     def get(self):
-        return sounds.WaveGenerator().sinusoid(configuration.SOUND_PROCESS_LENGTH, configuration.SOUND_DEFAULT_SAMPLERATE,
+        return sounds.WaveGenerator().sinusoid(cfg.SOUND_PROCESS_LENGTH, cfg.SOUND_DEFAULT_SAMPLERATE,
                                                self.parents[0].get())
 
 
