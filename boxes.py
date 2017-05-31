@@ -16,10 +16,10 @@ class SoundBox(object):
     def __init__(self, custom_buff=None):
         super(SoundBox, self).__init__()
         self.custom_buff = custom_buff
-        self.parents={}
+        self.parents = {}
 
     def set_parent(self, n, parent):
-        self.parents[n]=parent
+        self.parents[n] = parent
 
     def get(self):
         raise NotImplementedError()
@@ -141,22 +141,25 @@ class DeviceBox(SoundBox):
         value1
         CUID:channel
     """
-    datacenter=None
+    datacenter = None
 
-    def __init__(self,datacenter,custom_buff=None):
+    def __init__(self, datacenter, custom_buff=None):
         super(DeviceBox, self).__init__(custom_buff)
-        self.datacenter=datacenter
+        self.datacenter = datacenter
 
     def get(self):
-        cuid,channel=self.parents[0].get().split(":")
-        return self.datacenter.get(int(cuid),int(channel))
+        cuid, channel = self.parents[0].get().split(":")
+        return self.datacenter.get(int(cuid), int(channel))
+
 
 class RandomBox(SoundBox):
     """
     Give a random value
     """
+
     def get(self):
         return random.random()
+
 
 class MultiplyBox(SoundBox):
     """
@@ -167,8 +170,10 @@ class MultiplyBox(SoundBox):
         value1       , value2
         first number , second number
     """
+
     def get(self):
-        return eval(str(self.parents[0].get()))*eval(str(self.parents[1].get()))
+        return eval(str(self.parents[0].get())) * eval(str(self.parents[1].get()))
+
 
 class SumBox(SoundBox):
     """
@@ -179,8 +184,10 @@ class SumBox(SoundBox):
         value1       , value2
         first number , second number
     """
+
     def get(self):
-        return eval(str(self.parents[0].get()))+eval(str(self.parents[1].get()))
+        return eval(str(self.parents[0].get())) + eval(str(self.parents[1].get()))
+
 
 class OutBox(SoundBox):
     """
@@ -195,6 +202,103 @@ class OutBox(SoundBox):
     def get(self):
         return self.parents[0].get()
 
+
+class DistortionBox(SoundBox):
+    """
+    Give a distortion effect to the sound.
+
+    Parents :
+        0              , 1
+        sound1         , value1
+        sound to change, ratio of changing
+    """
+
+    def get(self):
+        sound1=self.parents[0].get()
+        value1=self.parents[1].get()
+        new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
+        for i in range(sound1.get_length()):
+            point = sound1.get_value(i)
+            if point > 255 - int(value1):
+                new_sound.add_value(255 - int(value1))
+            elif point < value1:
+                new_sound.add_value(value1)
+            else:
+                new_sound.add_value(point)
+        return new_sound
+
+
+class AmpliBox(SoundBox):
+    """
+    Amplificate a sound.
+
+    Parents :
+        0              , 1
+        sound1         , value1
+        sound to change, ratio of changing
+    """
+
+    def get(self):
+        sound1 = self.parents[0].get()
+        value1 = self.parents[1].get()
+        new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
+        for i in range(sound1.get_length()):
+            point = sound1.get_value(i)
+            np = max(0, min(255, ((point - 128) * value1) + 128))
+            new_sound.add_value(np)
+        return new_sound
+
+
+class DopplerBox(SoundBox):
+    """
+    give a Doppler effect to a sound.
+
+    Parents :
+        0              , 1
+        sound1         , value1
+        sound to change, ratio of changing
+    """
+
+    def get(self):
+        sound1 = self.parents[0].get()
+        value1 = self.parents[1].get()
+        new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
+        new_sound2 = new_sound.get_copy()
+        new_sound3 = new_sound.get_copy()
+
+        halfsoundlength = int(sound1.get_length() * 0.5)
+        for i in range(halfsoundlength):
+            point = sound1.get_value(i)
+
+            if int(i % (1 + (value1 / 340))) == 0:
+                new_sound.add_value(point)
+
+        for i in range(halfsoundlength - new_sound.get_length()):
+            point = new_sound.get_value(i)
+            new_sound.add_value(point)
+        for i in range(halfsoundlength):
+            point = new_sound.get_value(i)
+            a = i / halfsoundlength
+            np = max(0, min(255, round((point - 128) * a + 128)))
+            new_sound2.add_value(np)
+        for i in range(halfsoundlength):
+            point = sound1.get_value(i)
+            if int(i % (1 - (value1 / 340))) == 0:
+                new_sound3.add_value(point)
+
+        for i in range(halfsoundlength - new_sound.get_length()):
+            point = new_sound3.get_value(i)
+            new_sound3.add_value(point)
+
+        for i in range(halfsoundlength):
+            point = new_sound3.get_value(i)
+            a = (halfsoundlength - i) / halfsoundlength
+            np = max(0, min(255, round((point - 128) * a + 128)))
+            new_sound2.add_value(np)
+
+        return new_sound2
+
+
 boxes_identifiers = {
     "PITCH": PitchBox,
     "DEVICE": DeviceBox,
@@ -204,7 +308,10 @@ boxes_identifiers = {
     "SINE": SinBox,
     "VALUE": ValueBox,
     "OUT": OutBox,
-    "MULTI":MultiplyBox,
-    "RAND":RandomBox,
-    "SUM":SumBox
+    "MULTI": MultiplyBox,
+    "RAND": RandomBox,
+    "SUM": SumBox,
+    "DIST":DistortionBox,
+    "AMP": AmpliBox,
+    "DOP": DopplerBox
 }

@@ -110,25 +110,24 @@ class WaveSound(object):
         return [e for e in self.get_data()]
 
     def add(self, sound, fac=0.5):
-        return self.add_part(sound,0,fac)
+        return self.add_part(sound, 0, fac)
 
-    def add_part(self,sound,pos,fac=0.5):
+    def add_part(self, sound, pos, fac=0.5):
         assert self.get_samplerate() == sound.get_samplerate()
         assert self.get_bitpersample() == sound.get_bitpersample()
         assert self.get_num_channels() == sound.get_num_channels()
         new_data = b''
         for i in range(pos):
             new_data += int(self.get_value(i).to_bytes(self.get_bitpersample() // 8, "big"))
-        for i in range(pos,pos+sound.get_length()):
-            if i>self.get_length():
+        for i in range(pos, pos + sound.get_length()):
+            if i > self.get_length():
                 break
-            new_data += int((self.get_value(i) * (1 - fac)) + (sound.get_value(i-pos) * (fac))).to_bytes(
+            new_data += int((self.get_value(i) * (1 - fac)) + (sound.get_value(i - pos) * (fac))).to_bytes(
                 self.get_bitpersample() // 8, "big")
-        for i in range(pos+sound.get_length(),self.get_length()):
+        for i in range(pos + sound.get_length(), self.get_length()):
             new_data += int(self.get_value(i).to_bytes(self.get_bitpersample() // 8, "big"))
         self.set_data(new_data)
         return self
-
 
 
 class WaveGenerator():
@@ -157,13 +156,16 @@ class WaveGenerator():
             sound.add_value(int(v))
         return sound
 
+
 try:
     import ossaudiodev as ossa
+
     OSSAUDIO_AVAILABLE = True
 except ImportError:
     print("ossaudiodev not found !")
 try:
     import winaudio as wina
+
     WINAUDIO_AVAILABLE = True
 except ImportError:
     print("winaudio not found !")
@@ -190,7 +192,7 @@ class SoundOutput():
                     dsp = ossa.open(devname, 'w')
                     break
                 except Exception as e:
-                    os.system("fuser "+devname+" -k")
+                    os.system("fuser " + devname + " -k")
                     time.sleep(0.5)
             self.device = dsp
         elif WINAUDIO_AVAILABLE:
@@ -259,4 +261,4 @@ class SoundPlayer(threading.Thread):
         self.is_paused = True
 
     def flush(self):
-        self.to_be_played=[]
+        self.to_be_played = []
