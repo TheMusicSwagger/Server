@@ -215,7 +215,7 @@ class DistortionBox(SoundBox):
 
     def get(self):
         sound1 = self.parents[0].get()
-        value1 = self.parents[1].get()
+        value1 = eval(str(self.parents[1].get()))
         new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
         for i in range(sound1.get_length()):
             point = sound1.get_value(i)
@@ -240,7 +240,7 @@ class AmpliBox(SoundBox):
 
     def get(self):
         sound1 = self.parents[0].get()
-        value1 = self.parents[1].get()
+        value1 = eval(str(self.parents[1].get()))
         new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
         for i in range(sound1.get_length()):
             point = sound1.get_value(i)
@@ -261,7 +261,7 @@ class DopplerBox(SoundBox):
 
     def get(self):
         sound1 = self.parents[0].get()
-        value1 = self.parents[1].get()
+        value1 = eval(str(self.parents[1].get()))
         new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
         new_sound2 = new_sound.get_copy()
         new_sound3 = new_sound.get_copy()
@@ -310,7 +310,7 @@ class AbsBox(SoundBox):
     """
 
     def get(self):
-        return abs(eval(self.parents[0].get()))
+        return abs(eval(str(self.parents[0].get())))
 
 
 class CropBox(SoundBox):
@@ -325,7 +325,7 @@ class CropBox(SoundBox):
     """
 
     def get(self):
-        value1, value2, value3 = [eval(self.parents[i].get()) for i in range(3)]
+        value1, value2, value3 = [eval(str(self.parents[i].get())) for i in range(3)]
         if value1 < value2:
             return value2
         if value1 > value3:
@@ -345,7 +345,7 @@ class ResizeBox(SoundBox):
     """
 
     def get(self):
-        value1, value2, value3, value4, value5 = [eval(self.parents[i].get()) for i in range(5)]
+        value1, value2, value3, value4, value5 = [eval(str(self.parents[i].get())) for i in range(5)]
         return (((value1 - value2) * (value5 - value4)) / (value3 - value2)) + value4
 
 
