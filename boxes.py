@@ -214,8 +214,8 @@ class DistortionBox(SoundBox):
     """
 
     def get(self):
-        sound1=self.parents[0].get()
-        value1=self.parents[1].get()
+        sound1 = self.parents[0].get()
+        value1 = self.parents[1].get()
         new_sound = sounds.WaveSound(sound1.get_samplerate(), sound1.get_bitpersample(), sound1.get_num_channels())
         for i in range(sound1.get_length()):
             point = sound1.get_value(i)
@@ -299,6 +299,56 @@ class DopplerBox(SoundBox):
         return new_sound2
 
 
+class AbsBox(SoundBox):
+    """
+    Returns the absolute value of a value.
+
+    Parents :
+        0
+        value1
+        value to remove sign
+    """
+
+    def get(self):
+        return abs(eval(self.parents[0].get()))
+
+
+class CropBox(SoundBox):
+    """
+    Crop a value to bounds
+
+    Parents :
+        0                   , 1          , 2
+        value1              , value2     , value3
+        value to remove sign, lower bound, upper bound
+
+    """
+
+    def get(self):
+        value1, value2, value3 = [eval(self.parents[i].get()) for i in range(3)]
+        if value1 < value2:
+            return value2
+        if value1 > value3:
+            return value3
+        return value2
+
+
+class ResizeBox(SoundBox):
+    """
+    Change the interval of a value
+
+    Parents :
+        0                   , 1              , 2              , 3              , 4
+        value1              , value2         , value3         , value4         , value5
+        value to remove sign, old lower bound, old upper bound, new lower bound, new upper bound
+
+    """
+
+    def get(self):
+        value1, value2, value3, value4, value5 = [eval(self.parents[i].get()) for i in range(5)]
+        return (((value1 - value2) * (value5 - value4)) / (value3 - value2)) + value4
+
+
 boxes_identifiers = {
     "PITCH": PitchBox,
     "DEVICE": DeviceBox,
@@ -311,7 +361,10 @@ boxes_identifiers = {
     "MULTI": MultiplyBox,
     "RAND": RandomBox,
     "SUM": SumBox,
-    "DIST":DistortionBox,
+    "DIST": DistortionBox,
     "AMP": AmpliBox,
-    "DOP": DopplerBox
+    "DOP": DopplerBox,
+    "ABS": AbsBox,
+    "CROP":CropBox,
+    "RESI":ResizeBox
 }
