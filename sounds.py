@@ -204,8 +204,12 @@ class SoundOutput():
 
     def play(self, sound):
         if self.type == 0:
+            start=time.time()
             self.device.setparameters(ossa.AFMT_MPEG, sound.get_num_channels(), sound.get_samplerate())
             self.device.write(sound.get_data())
+            t=0.9*(sound.get_length()/sound.get_samplerate())-(time.time()-start)
+            if t>0:
+                time.sleep(t)
         elif self.type == 1:
             # TODO : Windows support
             print("Currently not supporting Windows")
@@ -220,22 +224,18 @@ class SoundPlayer(threading.Thread):
     is_running = None
     is_paused = None
     output = None
-    last_sound = None
-    # buffer to store the last played sound (play until new is received)
-    to_be_played = None
-
-    # list of sounds to be played (pop to last sound)
+    sound = None
+    # buffer to store the played sound (play until new is received)
     def __init__(self):
         super(SoundPlayer, self).__init__()
         self.output = SoundOutput()
         self.is_running = True
         self.is_paused = True
-        self.to_be_played = []
         self.daemon = True
         self.start()
 
     def play(self, sound):
-        self.to_be_played.append(sound)
+        self.sound=sound
         self.is_paused = False
 
     def run(self):
@@ -243,22 +243,12 @@ class SoundPlayer(threading.Thread):
             if self.is_paused:
                 time.sleep(0.01)
             else:
-                if len(self.to_be_played) > 0:
-                    self.last_sound = self.to_be_played.pop(0)
-                self.output.play(self.last_sound)
+                self.output.play(self.sound)
 
-    def kill(self, force=False):
-        if force:
-            self.flush()
-        while len(self.to_be_played) > 0:
-            time.sleep(0.001)
-        self.flush()
+    def kill(self):
         self.is_running = False
         self.output.close()
         self.join()
 
     def pause(self):
         self.is_paused = True
-
-    def flush(self):
-        self.to_be_played = []

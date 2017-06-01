@@ -1,4 +1,4 @@
-import os, uuid, time, pymysql, boxes as bxs
+import time, pymysql, boxes as bxs
 from communicator.communicator import Communicator
 from sounds import SoundPlayer
 from serv_config import Config as cfg
@@ -44,19 +44,6 @@ class ServerBrain(object):
 
     # the datacenter where all last device values are stores
     def __init__(self, data_center):
-        """
-        # useless for server
-        if os.path.isfile(cfg.GUID_FILENAME):
-            guidfile = open(cfg.GUID_FILENAME, "r")
-            self.global_uid = guidfile.read()
-            guidfile.close()
-        else:
-            guidfile = open(cfg.GUID_FILENAME, "w")
-            self.global_uid = str(uuid.uuid4()).replace("-", "")
-            guidfile.write(self.global_uid)
-            guidfile.close()
-
-        """
         try:
             self.database = pymysql.connect(host=cfg.DB_IP, user=cfg.DB_USER, password=cfg.DB_PASS, db=cfg.DB_NAME,
                                             charset=cfg.DB_CHARSET)
@@ -67,7 +54,7 @@ class ServerBrain(object):
         self.datacenter = datacenter
 
     def stop(self):
-        self.player.kill(True)
+        self.player.kill()
         self.communicator.stop()
 
     def db_query(self, query, args=()):
@@ -96,7 +83,6 @@ class ServerBrain(object):
             boxes[link[2]].set_parent(link[3], boxes[link[1]])
         self.tree = boxes
         self.output = self.tree[0]
-        self.player.flush()
 
     def check_update(self):
         very_last_update = self.db_query("SELECT ID FROM " + cfg.TB_UPDATE_NUMBER)[0]

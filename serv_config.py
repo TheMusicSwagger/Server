@@ -2,7 +2,7 @@ import time
 
 
 class Config:
-    SOUND_PROCESS_LENGTH = 50
+    SOUND_PROCESS_LENGTH = 100
     SOUND_DEFAULT_SAMPLERATE = 22000
     # sound constants
 
